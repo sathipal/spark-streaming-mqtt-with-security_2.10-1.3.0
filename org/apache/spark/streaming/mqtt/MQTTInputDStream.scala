@@ -85,38 +85,37 @@ class MQTTReceiver(
 
     // Set up persistence for messages
     val persistence = new MemoryPersistence()
-	var clientId = clientID;
-	if(clientId == null) {
-		clientId = MqttClient.generateClientId()
-	}
+    var clientId = clientID;
+    if(clientId == null) {
+    	clientId = MqttClient.generateClientId()
+    }
 	
-	// Initializing Mqtt Client specifying brokerUrl, clientID and MqttClientPersistance
+    // Initializing Mqtt Client specifying brokerUrl, clientID and MqttClientPersistance
     val client = new MqttClient(brokerUrl, clientId, persistence)
 
-	val connectOptions = new MqttConnectOptions()
-	if(userName != null && password != null) {
-		// Create a secure connection
-		connectOptions.setUserName(userName)
-		connectOptions.setPassword(password.toCharArray())
-		
-		val sslContext = SSLContext.getInstance("TLSv1.2");
-		sslContext.init(null, null, null);
-		connectOptions.setSocketFactory(sslContext.getSocketFactory());
-	}
+    val connectOptions = new MqttConnectOptions()
+    if(userName != null && password != null) {
+    	// Create a secure connection
+    	connectOptions.setUserName(userName)
+    	connectOptions.setPassword(password.toCharArray())
+    	val sslContext = SSLContext.getInstance("TLSv1.2");
+    	sslContext.init(null, null, null);
+    	connectOptions.setSocketFactory(sslContext.getSocketFactory());
+    }
 
     // Callback automatically triggers as and when new message arrives on specified topic
     val callback: MqttCallback = new MqttCallback() {
-
-      // Handles Mqtt message
-      override def messageArrived(arg0: String, arg1: MqttMessage) {
-        store(arg0 + " "+ new String(arg1.getPayload(),"utf-8"))
-      }
+    	// Handles Mqtt message
+    	override def messageArrived(arg0: String, arg1: MqttMessage) {
+    	    store(arg0 + " "+ new String(arg1.getPayload(),"utf-8"))
+    	}
 
       override def deliveryComplete(arg0: IMqttDeliveryToken) {
+      	
       }
 
       override def connectionLost(arg0: Throwable) {
-        restart("Connection lost ", arg0)
+          restart("Connection lost ", arg0)
       }
     }
 
