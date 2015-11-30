@@ -25,6 +25,7 @@ import scala.reflect.ClassTag
 import java.util.Properties
 import java.util.concurrent.Executors
 import java.io.IOException
+import javax.net.ssl.SSLContext;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttClient
@@ -84,19 +85,23 @@ class MQTTReceiver(
 
     // Set up persistence for messages
     val persistence = new MemoryPersistence()
-
-	if(clientID == null) {
-		clientID = MqttClient.generateClientId()
+	var clientId = clientID;
+	if(clientId == null) {
+		clientId = MqttClient.generateClientId()
 	}
 	
 	// Initializing Mqtt Client specifying brokerUrl, clientID and MqttClientPersistance
-    val client = new MqttClient(brokerUrl, clientID, persistence)
+    val client = new MqttClient(brokerUrl, clientId, persistence)
 
+	val connectOptions = new MqttConnectOptions()
 	if(userName != null && password != null) {
 		// Create a secure connection
-		val connectOptions = new MqttConnectOptions()
 		connectOptions.setUserName(userName)
 		connectOptions.setPassword(password.toCharArray())
+		
+		val sslContext = SSLContext.getInstance("TLSv1.2");
+		sslContext.init(null, null, null);
+		connectOptions.setSocketFactory(sslContext.getSocketFactory());
 	}
 
     // Callback automatically triggers as and when new message arrives on specified topic
