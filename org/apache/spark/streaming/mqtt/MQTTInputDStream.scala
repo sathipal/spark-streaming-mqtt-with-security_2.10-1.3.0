@@ -34,6 +34,7 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.MqttTopic
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 
 import org.apache.spark.Logging
 import org.apache.spark.storage.StorageLevel
@@ -54,11 +55,14 @@ class MQTTInputDStream(
     @transient ssc_ : StreamingContext,
     brokerUrl: String,
     topic: String,
-    storageLevel: StorageLevel
+    storageLevel: StorageLevel,
+    clientID: String,
+    userName: String,
+    password: String
   ) extends ReceiverInputDStream[String](ssc_) {
 
   def getReceiver(): Receiver[String] = {
-    new MQTTReceiver(brokerUrl, topic, storageLevel)
+    new MQTTReceiver(brokerUrl, topic, storageLevel, clientID, userName, password)
   }
 }
 
@@ -66,7 +70,10 @@ private[streaming]
 class MQTTReceiver(
     brokerUrl: String,
     topic: String,
-    storageLevel: StorageLevel
+    storageLevel: StorageLevel,
+    clientID: String,
+    userName: String,
+    password: String
   ) extends Receiver[String](storageLevel) {
 
   def onStop() {
@@ -78,15 +85,26 @@ class MQTTReceiver(
     // Set up persistence for messages
     val persistence = new MemoryPersistence()
 
-    // Initializing Mqtt Client specifying brokerUrl, clientID and MqttClientPersistance
-    val client = new MqttClient(brokerUrl, MqttClient.generateClientId(), persistence)
+	if(clientID == null) {
+		clientID = MqttClient.generateClientId()
+	}
+	
+	// Initializing Mqtt Client specifying brokerUrl, clientID and MqttClientPersistance
+    val client = new MqttClient(brokerUrl, clientID, persistence)
+
+	if(userName != null && password != null) {
+		// Create a secure connection
+		val connectOptions = new MqttConnectOptions()
+		connectOptions.setUserName(userName)
+		connectOptions.setPassword(password.toCharArray())
+	}
 
     // Callback automatically triggers as and when new message arrives on specified topic
     val callback: MqttCallback = new MqttCallback() {
 
       // Handles Mqtt message
       override def messageArrived(arg0: String, arg1: MqttMessage) {
-        store(new String(arg1.getPayload(),"utf-8"))
+        store(arg0 + " "+ new String(arg1.getPayload(),"utf-8"))
       }
 
       override def deliveryComplete(arg0: IMqttDeliveryToken) {
@@ -102,10 +120,11 @@ class MQTTReceiver(
     client.setCallback(callback)
 
     // Connect to MqttBroker
-    client.connect()
+    client.connect(connectOptions)
 
     // Subscribe to Mqtt topic
     client.subscribe(topic)
 
   }
 }
+
