@@ -25,7 +25,7 @@ Follow the steps present in [this recipe](http://www.ibm.com/internet-of-things/
 Programming
 ------------
 
-In this section we detail how to use this spark-streaming-mqtt-connector library to connect to [IBM Watson IoT Platform](http://www.ibm.com/internet-of-things/) and consume the device events from them.
+In this section we detail how to use this spark-streaming-mqtt-connector library to connect to [IBM Watson IoT Platform](http://www.ibm.com/internet-of-things/) and consume the device events.
 
 As a first step, create a Streaming context by specifying the Spark configuration and batch interval,
 
@@ -44,7 +44,7 @@ where the different parameters are formed as follows,
 
 ##### IBM Watson IoT Platform URL #####
 
-<orgid>.messaging.internetofthings.ibmcloud.com using TLS at port 8883 where <org-id> is the organization identifier, which is displayed in the portal when you signed in.
+orgid.messaging.internetofthings.ibmcloud.com using TLS at port 8883, where org-id is the organization identifier, which is displayed in the portal when you signed in.
 
 ##### Topic name #####
 
@@ -52,9 +52,7 @@ The topic name used to receive events from one or more devices as follows,
 
     iot-2/type/device_type/id/device_id/evt/event_id/fmt/format_string
 
-**Note**
-
-The MQTT “any” wildcard character (+) may be used for any of the following components if you want to subscribe to more than one type of event, or events from more than a single device.
+**Note**: The MQTT “any” wildcard character (+) may be used for any of the following components if you want to subscribe to more than one type of event, or events from more than a single device.
 
 * device_type
 * device_id
@@ -69,7 +67,7 @@ There are different storage levels offered by Spark, choose one appropriate for 
 
 Supply a client ID of the form,
 
-    a:<org-id>:<app-id> where:
+    a:<org-id>:<app-id>
 
 * a indicates the client is an application.
 * org_id is your unique organization ID, assigned when you sign up with the service. It will be a 6 character alphanumeric string.
@@ -87,8 +85,8 @@ Look at this recipe if you want to know more about the Scalable application deve
 
 #### Auth key and token ####
 
-MQTT username with the API-Key's "Key" property
-MQTT password containing the API-Key's "Auth-Token" property 
+* MQTT username with the API-Key's "Key" property
+* MQTT password containing the API-Key's "Auth-Token" property 
 
 ----
 
