@@ -42,11 +42,11 @@ Then create an input DStream using MQTTUtils as follows,
 
 where the different parameters are formed as follows,
 
-##### IBM Watson IoT Platform URL #####
+##### 1. IBM Watson IoT Platform URL #####
 
 orgid.messaging.internetofthings.ibmcloud.com using TLS at port 8883, where org-id is the organization identifier, which is displayed in the portal when you signed in.
 
-##### Topic name #####
+##### 2. MQTT Topic #####
 
 The topic name used to receive events from one or more devices as follows,
 
@@ -59,11 +59,7 @@ The topic name used to receive events from one or more devices as follows,
 * event_id
 * format_string
 
-##### RDD storage level #####
-
-There are different storage levels offered by Spark, choose one appropriate for you. For more information about storage level, read the Spark guide.
-
-##### MQTT Client Identifier #####
+##### 3. MQTT Client Identifier #####
 
 Supply a client ID of the form,
 
@@ -83,7 +79,7 @@ Note the difference in the first character, the block letter "A" means the appli
 
 Look at this recipe if you want to know more about the Scalable application development in IBM Watson IoT Platform.
 
-#### Auth key and token ####
+#### 4 & 5. Auth key and token ####
 
 * MQTT username with the API-Key's "Key" property
 * MQTT password containing the API-Key's "Auth-Token" property 
@@ -98,7 +94,13 @@ Then, in the next step, add the code to parse the topic and associate the messag
     deviceMappedLines.print()
     ssc.start()
     ssc.awaitTermination()
-    
+
+##### 6. RDD storage level (Optional) #####
+
+There are different storage levels offered by Spark, choose one appropriate for you. For more information about storage level, [read the Spark guide](http://spark.apache.org/docs/latest/programming-guide.html).  
+
+If you don't specify a RDD storage level, then by default StorageLevel.MEMORY_AND_DISK_SER_2 is used.
+
 ----
 
 Deploying Outside Bluemix
