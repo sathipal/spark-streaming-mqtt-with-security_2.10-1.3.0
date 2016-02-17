@@ -22,8 +22,8 @@ How to use in IBM Bluemix?
 
 Follow the steps present in [this recipe](http://www.ibm.com/internet-of-things/) to onboard IoT device events to Apache Spark.
 
-Programming
-------------
+Create Streams
+--------------
 
 In this section we detail how to use this spark-streaming-mqtt-connector library to connect to [IBM Watson IoT Platform](http://www.ibm.com/internet-of-things/) and consume the device events.
 
@@ -88,10 +88,21 @@ Look at this recipe if you want to know more about the Scalable application deve
 * MQTT username with the API-Key's "Key" property
 * MQTT password containing the API-Key's "Auth-Token" property 
 
+Then, in the next step, add the code to parse the topic and associate the messages with deviceId as shown below, Also start the streaming context such that it runs for every batch interval that we specified earlier.
+
+    /*
+     * The message topic and payload is split with space, so lets split the message with space
+     * and keep the deviceId as key and payload as value.
+     */
+    val deviceMappedLines = lines.map(x => ((x.split(” “, 2)(0)).split(“/”)(4), x.split(” “, 2)(1)))
+    deviceMappedLines.print()
+    ssc.start()
+    ssc.awaitTermination()
+    
 ----
 
-Deploying
----------
+Deploying Outside Bluemix
+-------------------------
 
 As with any Spark applications, spark-submit can be used to launch your application. 
 
