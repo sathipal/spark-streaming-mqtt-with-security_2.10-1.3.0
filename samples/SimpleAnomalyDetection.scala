@@ -37,9 +37,12 @@ val deviceMappedLines = lines.map(x => ((x.split(" ", 2)(0)).split("/")(4), x.sp
 // Map the Json payload into scala map
 val jsonLines = deviceMappedLines.map(x => {
     var dataMap:Map[String, Any] = Map()
-	val payload = new JsonParser().parse(x._2).getAsJsonObject()
-    val deviceObject = payload.get("d").getAsJsonObject()
-	val setObj = deviceObject.entrySet()
+    val payload = new JsonParser().parse(x._2).getAsJsonObject()
+    var deviceObject = payload
+    if(deviceObject.has("d")) {
+        deviceObject = payload.get("d").getAsJsonObject()
+    }
+    val setObj = deviceObject.entrySet()
     val itr = setObj.iterator()
     while(itr.hasNext()) {
 		val entry = itr.next();
